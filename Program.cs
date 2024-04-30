@@ -22,6 +22,8 @@ namespace course_project
             OpenAndAddToWordprocessingStream(stream);
 
             // Закрытие файла. PS Важно закрыть файл, так как иначе он повредится и открыть его будет невозвожно!
+            // Y: Возможно, тут лучше использовать Dispose, так как он делает то же самое, но лучше (Источник: https://github.com/dotnet/Open-XML-SDK/issues/1298)
+            // stream.Dispose();
             stream.Close();
         }
 
@@ -42,11 +44,10 @@ namespace course_project
                 {
                     if (element is Paragraph paragraph)
                     {
-                        Console.WriteLine(paragraph.InnerText); // Вывод текста в консоль для проверки работы
+                        //Console.WriteLine(paragraph.InnerText); // Вывод текста в консоль для проверки работы
                     }
                 }
             }
-
             // Проверка на пустоту стилей
             if (mainDocumentPart is null || mainDocumentPart.StyleDefinitionsPart is null || mainDocumentPart.StylesWithEffectsPart is null)
             {
@@ -59,6 +60,12 @@ namespace course_project
 
             // Я пока не знаю какой метод из двух использовать нужно будет, посмотрим позже PS StylesWithEffectsPart из за чего то равен null,
             // поэтому как использовать пока не разобрался 
+
+            // Y: Судя по всему, StylesWithEffects - пафосные стили текста (тень, подсветка и пр.),
+            // причём появившиеся в одной из поздних версий Ворда (после версии 2007 года)
+            // Хранятся они отдельно из соображений совместимости версий.
+            // Короче, нам это либо надо как ошибку помечать, либо эта настройка нам вообще не понадобится.
+
             // stylesPart = mainDocumentPart.StylesWithEffectsPart;
             stylesPart = mainDocumentPart.StyleDefinitionsPart;
 
@@ -77,6 +84,7 @@ namespace course_project
                 Console.WriteLine(el);
 
             // Dispose the document handle. PS Не понимаю что делает эта строчка, но оставил ее
+            // Y: Как я понял, сохраняет изменения, закрывает файл и удаляет из памяти ненужное
             wordprocessingDocument.Dispose();
         }
 
